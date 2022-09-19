@@ -300,9 +300,16 @@ public class MeasureVersionBuilder extends Builder implements SimpleBuildStep, S
    private MeasurementConfig generateMeasurementConfig(final FilePath workspace, final TaskListener listener)
          throws IOException, InterruptedException {
       final MeasurementConfig measurementConfig = getMeasurementConfig();
-      listener.getLogger().println("Starting RemoteVersionReader");
+      listener.getLogger().println("Starting RemoteVersionReader " + workspace + " " +  workspace.getName());
       final RemoteVersionReader remoteVersionReader = new RemoteVersionReader(measurementConfig, listener);
-      final MeasurementConfig configWithRealGitVersions = workspace.act(remoteVersionReader);
+      MeasurementConfig configWithRealGitVersions = workspace.act(remoteVersionReader);
+      System.out.println("Acting finished..." + configWithRealGitVersions);
+      int i = 0;
+      while (configWithRealGitVersions == null && i++ < 10) {
+         configWithRealGitVersions = workspace.act(remoteVersionReader);
+         System.out.println("Second acting finished..." + configWithRealGitVersions);
+        
+      }
       FixedCommitConfig fixedCommitConfig = configWithRealGitVersions.getFixedCommitConfig();
       listener.getLogger().println("Read version: " + fixedCommitConfig.getCommit() + " " + fixedCommitConfig.getCommitOld());
       return configWithRealGitVersions;

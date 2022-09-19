@@ -23,6 +23,7 @@ public class RemoteVersionReader implements FileCallable<MeasurementConfig> {
    public RemoteVersionReader(final MeasurementConfig measurementConfig, final TaskListener listener) {
       this.measurementConfig = measurementConfig;
       this.listener = listener;
+      System.out.println("Initializing...");
    }
 
    @Override
@@ -31,7 +32,11 @@ public class RemoteVersionReader implements FileCallable<MeasurementConfig> {
 
    @Override
    public MeasurementConfig invoke(final File workspaceFolder, final VirtualChannel channel) throws IOException, InterruptedException {
+      System.out.println("Invoke!");
       try (JenkinsLogRedirector redirector = new JenkinsLogRedirector(listener)) {
+         System.out.println("Starting processing");
+         System.out.println();
+         
          final String version = GitUtils.getName("HEAD", workspaceFolder);
          measurementConfig.getFixedCommitConfig().setCommit(version);
          if (measurementConfig.getFixedCommitConfig().getCommitOld() != null) {
@@ -40,6 +45,11 @@ public class RemoteVersionReader implements FileCallable<MeasurementConfig> {
          }
          return measurementConfig;
       } catch (Throwable e) {
+         
+         System.out.println("Some error occured");
+         System.out.println();
+         
+         
          e.printStackTrace(listener.getLogger());
          e.printStackTrace();
          return null;
